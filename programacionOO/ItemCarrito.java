@@ -24,7 +24,7 @@ public class ItemCarrito {
 		return subtotal;
 	}
 	public static void mostrarTitulo() {
-		System.out.println("Cant\tPrecio\tSubtotal\tProducto");
+		System.out.println("Cant\tPrecio\tProducto\tSubtotal");
 	}
 	public void mostrarItems() {
 		System.out.println(cant+"\t"+prod.muestra_precio()+"\t"+prod.muestra_nombre()+"\t"+subtotal);

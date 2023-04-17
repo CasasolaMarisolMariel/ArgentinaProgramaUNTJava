@@ -1,8 +1,12 @@
 package programacionOO;
 
+import java.time.LocalDate;
+
 public class Compras {
 
 	public static void main(String[] args) {
+		LocalDate dia=LocalDate.now();
+		System.out.println(dia);
 		System.out.println("Lista de productos del Carrito: " );
 		//OBJETOS PRODUCTO
 		Producto p1=new Producto(100,"Dulce de leche","Repostero x500g",450.30,1000);
@@ -45,5 +49,22 @@ public class Compras {
 			total=total+lista.dameSub();
 		}
 		carro.mostrarMontoTotal(total);
+		//Descuento d1=new DescuentoFijo();
+		//d1.asignarValorDesc(250);//monto fijo descuento
+		//System.out.println("Hay un descuento fijo de : $ " +d1.dameValorDesc() );
+		//System.out.println(d1.valorFinal(total));
+		Descuento d1=new DescuentoPorcentaje();
+		d1.asignarValorDesc(70);
+		Descuento tope=new DescuentoPorcT();
+		tope.asignarValorDesc(50);
+		if (d1.dameValorDesc()>=tope.dameValorDesc()) {
+			System.out.println("No se aplica descuento,el tope es del: " +tope.dameValorDesc() +" %");
+			System.out.println("Debe abonar: $ " +total);
+		}
+		else {
+			System.out.println("Hay un descuento del : " +d1.dameValorDesc() +"%");
+			System.out.println("Se debe pagar: " +d1.valorFinal(total));
+			
+		}
 	}
 }

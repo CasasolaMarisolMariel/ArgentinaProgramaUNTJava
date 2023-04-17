@@ -5,9 +5,9 @@ public class Carrito {
 		private Cliente cli;
 		private double montoTotal;
 	public Carrito(int num,Cliente cliente) {
-		numC=num;
-		cli=cliente;
-		montoTotal=0.0;
+		this.numC=num;
+		this.cli=cliente;
+		this.montoTotal=0.0;
 	}
 	public int dameNumC() {
 		return numC;

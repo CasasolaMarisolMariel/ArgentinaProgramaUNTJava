@@ -4,10 +4,10 @@ public class Carrito {
 		private int numC;
 		private Cliente cli;
 		private double montoTotal;
-	public Carrito(int num,Cliente cliente) {
+	public Carrito(int num,Cliente cli) {
 		this.numC=num;
-		this.cli=cliente;
-		this.montoTotal=0.0;
+		this.cli=cli;
+		this.montoTotal=00.00;
 	}
 	public int dameNumC() {
 		return numC;
@@ -15,12 +15,13 @@ public class Carrito {
 	public Cliente dameCliente() {
 		return cli;
 	}
-	public double dameMonto() {
+	public double dameMonto(double total) {
+		montoTotal= total;
 		return montoTotal;
 	}
 	public void mostrarMontoTotal(double total) {
 		montoTotal=total;
-		System.out.println("El monto total del Carrito es : " +montoTotal);
+		System.out.println("El monto total del Carrito es : $" +montoTotal);
 	}
 
 }

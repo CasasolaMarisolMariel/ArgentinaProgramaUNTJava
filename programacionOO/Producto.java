@@ -6,19 +6,15 @@ public class Producto {
 	private String desc;
 	private double precio;
 	private int stock;
-	//MÉTODO CONSTRUCTOR
+	
 	public Producto(int cod,String nom,String des,double prec,int stc) {
-		//Mismo nombre que la clase OBLIGATORIO
 		codigo=cod;
 		nombre=nom;
 		desc=des;
 		precio=prec;
 		stock=stc;
-		//para no usar el this.nombre por ej
 		
 	}
-	//métodos getters para acceder a los
-	//valores de los atributos
 	public int muestra_cod() {
 		return codigo;
 	}

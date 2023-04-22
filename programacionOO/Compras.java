@@ -1,70 +1,122 @@
 package programacionOO;
-
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Scanner; 
 
 public class Compras {
-
 	public static void main(String[] args) {
-		LocalDate dia=LocalDate.now();
-		System.out.println(dia);
-		System.out.println("Lista de productos del Carrito: " );
-		//OBJETOS PRODUCTO
-		Producto p1=new Producto(100,"Dulce de leche","Repostero x500g",450.30,1000);
-		Producto p2=new Producto(101,"Leche","En polvo x500grs.",200,1000);
-		Producto p3=new Producto(102,"Pan","Casero x500grs",150,500);
-		Producto p4=new Producto(103,"Cafe","Frasco x 500 grs",450.30,1000);
-		Producto p5= new Producto (104,"Salchichas","OTTO x6 unidades", 205.15,300);
-		Producto p6=new Producto(105,"Huevo","6 unidades",300,1000);
-		Producto p7= new Producto(106,"Papel Higienico","4 unidades x80mts",600.00,1500);
-		//OBJETOS CLIENTE
-		Cliente c1=new Cliente(1,47588745,"Marta Juarez","Los ceibos 432");
-		Cliente c2=new Cliente(2,47599547,"Roberto Rodriguez","Siempre viva 123");
-		Cliente c3=new Cliente(35,24588777,"Martina Rodriguez","Villa primavera 547");
-		Cliente c4=new Cliente(98,18478574,"Alicia Escalera","Los ceibos 123");
+	ConexionBD conexion_c = new ConexionBD();
+	Connection cn_c = null;
+	Statement stm = null;
+	ResultSet rs = null;
+	ResultSet rs2=null;
+	try {
+		cn_c = conexion_c.conectar();
+		stm = cn_c.createStatement();
+		System.out.println("---Seccion de ingreso de productos que desea comprar---" );
+		System.out.print("nro de carro: ");
+		Scanner numCar=new Scanner (System.in);
+		String numc= numCar.nextLine();
+		int numCarr= Integer.parseInt(numc);
 		
-	//System.out.println("Codigo " +p1.muestra_cod()+" Nombre: "+p1.muestra_nombre()+" Precio: " +p1.muestra_precio());
-	//System.out.println("Codigo " +p2.muestra_cod()+" Nombre: "+p2.muestra_nombre()+" Precio: " +p2.muestra_precio());
-	//System.out.println("Codigo " +p3.muestra_cod()+" Nombre: "+p3.muestra_nombre()+" Precio: " +p3.muestra_precio());
-	//System.out.println("Codigo " +p4.muestra_cod()+" Nombre: "+p4.muestra_nombre()+" Precio: " +p4.muestra_precio());
-	//System.out.println("Codigo " +p5.muestra_cod()+" Nombre: "+p5.muestra_nombre()+" Precio: " +p5.muestra_precio());
-	//System.out.println("Codigo " +p6.muestra_cod()+" Nombre: "+p6.muestra_nombre()+" Precio: " +p6.muestra_precio());
-	//System.out.println("Codigo " +p7.muestra_cod()+" Nombre: "+p7.muestra_nombre()+" Precio: " +p7.muestra_precio());
-		//carro
-		Carrito carro=new Carrito(25,c1);
 		
-		//crear un vector con 3 elementos
-		ItemCarrito itemC[]=new ItemCarrito[3];
-		itemC[0]=new ItemCarrito(carro,p1,2);
-		/*Numero de carrito, producto 1, recibo dos unidades*/
-		itemC[1]=new ItemCarrito(carro,p2,3);
-		itemC[2]=new ItemCarrito(carro,p3,2);
-		ItemCarrito.mostrarTitulo();
-		mostrarItems(itemC,carro,c1);
-	
-	}
-	public static void mostrarItems(ItemCarrito vec[],Carrito carro,Cliente c) {
-		double total=0.0;
-		for (ItemCarrito lista:vec) {
-			lista.mostrarItems();
-			total=total+lista.dameSub();
+		System.out.println("Cantidad de productos que desea ingresar: ");
+		Scanner cant= new Scanner (System.in);
+		String c=cant.nextLine();
+		int cant_p= Integer.parseInt(c);
+		double total=0;
+		System.out.println("cant\tprecioUnitario\tproducto");
+		for (int i=0;i<cant_p;i++) {
+			System.out.print("Codigo del producto:");
+			Scanner sc= new Scanner (System.in);
+			String cod=sc.nextLine();
+			System.out.print("Ingrese la cantidad: ");
+			Scanner cp=new Scanner (System.in);
+			String cant_pr=cp.nextLine();
+			int cantidad=Integer.parseInt(cant_pr);
+			String query="SELECT * FROM productos WHERE id="+cod;
+			rs=stm.executeQuery(query);
+			while (rs.next()) {
+				int id= rs.getInt(1);
+				String nombre=rs.getString(2);
+				String desc=rs.getString(3);
+				double prec=rs.getDouble(4);
+				int stock=rs.getInt(5);
+				stock=stock-cantidad;
+				double prec_mod=prec*cantidad;
+				total=total+prec_mod;
+				System.out.println(cantidad +"\t"+prec+"\t"+nombre);
+				//ItemCarrito itemC1= new ItemCarrito(1,nombre,cantidad);
+				//MODIFICO EL STOCK Y PUEDO ACTUALIZARLO DESPUÉS EN LA BD
+				//System.out.print("El nuevo stock es: " +stock);
+			}}
+			
+			System.out.print("Ingrese el cuil del cliente: ");
+			Scanner cl=new Scanner(System.in);
+			String cliente= cl.nextLine();
+			int client= Integer.parseInt(cliente);
+			String consulta="SELECT * FROM clientes WHERE cuil="+client;
+			rs2=stm.executeQuery(consulta);
+			while (rs2.next()) {
+				// sql cuil nombre apellido dni direccion
+				int cuil=rs2.getInt(1);
+				String nom=rs2.getString(2);
+				String ap=rs2.getString(3);
+				int dni=rs2.getInt(4);
+				String dirC=rs2.getString(5);
+				//cargo cliente del carro de compra 
+				Cliente c1=new Cliente(cuil,dni,nom,dirC,ap);	
+				Carrito carro=new Carrito (numCarr,c1);
+				
+				//cargar los datos de compra en tabla compras
+				//BD id_carro,numCarro,cuilCliente,monto,fecha
+				LocalDateTime fecha= LocalDateTime.now();
+				//cuilCliente client
+				//numCarr 
+				double diner=0;
+				//seccion descuentos
+				Descuento d1=new DescuentoPorcentaje();
+				d1.asignarValorDesc(20);
+				Descuento tope=new DescuentoPorcT();
+				tope.asignarValorDesc(50);
+				if (d1.dameValorDesc()>=tope.dameValorDesc()) {
+					System.out.println("No se aplica descuento,el tope es del: " +tope.dameValorDesc() +" %");
+					carro.mostrarMontoTotal(total);
+					diner= carro.dameMonto(total);
+				}
+				else {
+					if (total>0) {
+						System.out.println("Hay un descuento del : " +d1.dameValorDesc() +"%");
+						carro.mostrarMontoTotal(total);	
+						System.out.println("Se debe pagar: $" +d1.valorFinal(total));
+						diner=d1.valorFinal(total);
+					}
+					else {
+						if (total==0) {
+							System.out.println("El monto es 0 no se aplica descuento");
+						}
+						else {
+							System.out.println("No se aplican descuentos a montos menores a 0");
+						}
+					}}	
+				//INSERTO EN LA BD LOS DATOS DE COMPRAS 	
+				String qr= "insert into compras (numCarro,cuilCliente,monto,fecha) values ("+numCarr+","+client+","+diner+","+"'"+fecha+"');";
+					stm.executeUpdate(qr);
+					try{
+						System.out.println("Se cargo el carrito con exito");
+					} catch (Exception e) {
+						System.out.println("Error");
+					}
 		}
-		carro.mostrarMontoTotal(total);
-		//Descuento d1=new DescuentoFijo();
-		//d1.asignarValorDesc(250);//monto fijo descuento
-		//System.out.println("Hay un descuento fijo de : $ " +d1.dameValorDesc() );
-		//System.out.println(d1.valorFinal(total));
-		Descuento d1=new DescuentoPorcentaje();
-		d1.asignarValorDesc(70);
-		Descuento tope=new DescuentoPorcT();
-		tope.asignarValorDesc(50);
-		if (d1.dameValorDesc()>=tope.dameValorDesc()) {
-			System.out.println("No se aplica descuento,el tope es del: " +tope.dameValorDesc() +" %");
-			System.out.println("Debe abonar: $ " +total);
-		}
-		else {
-			System.out.println("Hay un descuento del : " +d1.dameValorDesc() +"%");
-			System.out.println("Se debe pagar: " +d1.valorFinal(total));
 			
 		}
-	}
-}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+				e.printStackTrace();
+		}}}
